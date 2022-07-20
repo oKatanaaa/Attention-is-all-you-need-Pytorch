@@ -34,7 +34,7 @@ def calculate_bleu_score(decoder, dataloader, src_preprocess_fn, trg_preprocess_
 
 
 def create_dataloader(batch_size=32, seq_len=64, device='cpu'):
-    train_iter, valid_iter, test_iter = YandexDataset('data/datasets/Yandex').get_iters() # Multi30k('./data')
+    train_iter, valid_iter, test_iter = YandexDataset('datasets/Yandex').get_iters() # Multi30k('./data')
     
     en_tokenizer = spacy.load("en_core_web_sm")
     ru_tokenizer = spacy.load('ru_core_news_sm')

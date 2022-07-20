@@ -13,17 +13,35 @@ This repository contains an implementation of the original [Attention is All You
 
 ## General
 
-This is essentially the same as the repo above but with a much simpler training pipeline. I also updated some of the parts of his code base to a newer PyTorch API, so it looks much simples and works a lot faster.
+Implementation wise this is essentially the same as the [gordicaleksa/pytorch-original-transformer](https://github.com/gordicaleksa/pytorch-original-transformer) but with a much simpler training pipeline. I also updated some of the parts of his code base to a newer PyTorch API, so it looks much simpler and works a lot faster.
 
-I have trained my model on Yandex RU-EN and Multi30K EN-DE datasets, but provide weights only for the former. On RU-EN translation I got about 24 BLEU, on EN-DE about 14 BLEU.
+I have trained my model on Yandex RU-EN and Multi30K EN-DE datasets, but provide weights only for the former. On RU-EN translation I got about 23 BLEU, on EN-DE about 14 BLEU.
 
 The repo contains a single GPU pipeline as well as distributed training pipeline. 
+
+## Repo structure
+
+Folders:
+- `datasets` - you put your dataset here in a separate folder.
+- `weights` - weights are saved here.
+
+Files:
+- `data_utils.py` - all the data pipeline stuff.
+- `datasets.py` - contains a data loader for the Yandex dataset.
+- `decoding.py` - contains an implementation of a greedy decoder.
+- `model.py` - the actual model code.
+- `train.py` - training pipeline.
+- `train_distributed.py` - distributed training pipeline.
+- `model_distributed.py` - a slight modification of the original model code to make it train on several GPUs.
+- `inference.ipynb` - an example of model inference.
+- `training.ipynb` - training code, but in a notebook.
+- `data.ipynb` - a mess. Decided to leave it out in case you are curious. There is a sentence length distribution plot at the end of the notebook.
 
 ## Some details
 
 I don't use sinusoidal positional encoding and stick to the trainable ones (because they are much simpler). Also I replaced ReLU activation function with GELU as it is used in most of the nowadays transformer models.
 
-The Yandex dataset was filtered (the filtering code is available in the YandexDataset class) from Unicode and degenerate pairs of sentences (some pairs are way too different in length, hence there is no good correspondance between them which may hurt models accuracy). Filtering of the data improved BLEU from 18 to 24.
+The Yandex dataset was filtered (the filtering code is available in the YandexDataset class) from Unicode and degenerate pairs of sentences (some pairs are way too different in length, hence there is no good correspondance between them which may hurt models accuracy). Filtering of the data improved BLEU from 18 to 23.
 
 During training I don't do any evaluation since it is very slow (I gave zero ducks to making it fast as I do not intend to get SOTA). I just train the model and see the final result.
 
@@ -35,7 +53,7 @@ I also don't use learning rate schedule from the original paper since in my case
 | - | - | - | - | - | - | - |
 | Multi30K EN-DE | 48 | 32 | RTX2060 | 20 | ~30 minutes | 14 |
 | Yandex RU-EN | 256 | 64 | NVIDIA V100 | 20 | ~5 hours | 18 |
-| Yandex RU-EN filtered | 1024 | 64 | 4x NVIDIA V100 | 30 | ~9 hours | 24 |
+| Yandex RU-EN filtered | 1024 | 64 | 4x NVIDIA V100 | 30 | ~9 hours | 23 |
 
 As you can see, you can train the model on a middle sized GPU (RTX 2060) in a reasonable amount of time and get interesting results. I saw a guy train his model with GTX 1650 (sequence length 10) for 20 minutes and he also got some decent results. So you don't need a powerful GPU to play with the stuff.
 

@@ -86,7 +86,7 @@ class TextPadderDataset(torch.utils.data.IterableDataset):
         self.max_seq_length = max_seq_length
         self.debug = False
         self.device = device
-        self.pad_transform = PadTransform(max_length=max_seq_length, pad_value=pad_token)
+        self.pad_transform = PadTransform(max_length=max_seq_length, pad_value=src_vocab[pad_token])
         self.cache = [] if use_cache else None
         self.is_cache_ready = False
             
