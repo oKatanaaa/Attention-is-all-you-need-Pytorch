@@ -13,7 +13,7 @@ This repository contains an implementation of the original [Attention is All You
 
 ## General
 
-Implementation wise this is essentially the same as the [gordicaleksa/pytorch-original-transformer](https://github.com/gordicaleksa/pytorch-original-transformer) but with a much simpler training pipeline. I also updated some of the parts of his code base to a newer PyTorch API, so it looks much simpler and works a lot faster.
+Implementation wise it is similar to [gordicaleksa/pytorch-original-transformer](https://github.com/gordicaleksa/pytorch-original-transformer) but with a much simpler training pipeline and a bit more explicit model code. The training pipeline uses a newer PyTorch API making it a lot faster (and up-to-date).
 
 I have trained my model on Yandex RU-EN and Multi30K EN-DE datasets, but provide weights only for the former. On RU-EN translation I got about 23 BLEU, on EN-DE about 14 BLEU.
 
