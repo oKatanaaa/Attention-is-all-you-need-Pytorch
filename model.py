@@ -11,13 +11,7 @@ class Embedding(nn.Module):
 
     def forward(self, token_ids_batch):
         assert token_ids_batch.ndim == 2, f'Expected: (batch size, max token sequence length), got {token_ids_batch.shape}'
-
-        # token_ids_batch has shape (B, S/T), where B - batch size, S/T max src/trg token-sequence length
-        # Final shape will be (B, S/T, D) where D is the model dimension, every token id has associated vector
         embeddings = self.embeddings_table(token_ids_batch)
-
-        # (stated in the paper) multiply the embedding weights by the square root of model dimension
-        # Page 5, Chapter 3.4 "Embeddings and Softmax"
         return embeddings * math.sqrt(self.model_dimension)
 
 
@@ -181,9 +175,6 @@ class Transformer(nn.Module):
         return self.log_softmax(self.head(dec_out))
 
     def init_params(self, default_initialization=False):
-        # Not mentioned in the paper, but other implementations used xavier.
-        # I tested both PyTorch's default initialization and this, and xavier has tremendous impact! I didn't expect
-        # a model's perf, with normalization layers, to be so much dependent on the choice of weight initialization.
         if not default_initialization:
             for name, p in self.named_parameters():
                 if p.dim() > 1:

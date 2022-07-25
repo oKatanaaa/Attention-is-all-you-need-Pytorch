@@ -118,15 +118,6 @@ def main(batch_sz, seq_len, epochs, pretrained_weghts=None, gpu_id=0):
         print('Start training...')
         training_loop(model, dataloader, loss_obj, optim, epochs)
         print('Training has ended.')
-        print('Evaluation...')
-        from decoding import GreedyDecoder
-        decoder = GreedyDecoder(model, src_tokenizer, src_vocab=de_vocab, trg_vocab=en_vocab,
-            eos_token_id=3, sos_token_id=2, pad_token_id=1, max_seq_length=seq_len)
-        calculate_bleu_score(
-            decoder, valid_iter, 
-            lambda x: [token.text for token in src_tokenizer(x.lower())], 
-            lambda x: [token.text for token in trg_tokenizer(x.lower())]
-        )
     except Exception as ex:
         print(ex)
 

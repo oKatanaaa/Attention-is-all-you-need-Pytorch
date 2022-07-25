@@ -4,6 +4,7 @@ This repository contains an implementation of the original [Attention is All You
 
 ## Table of Contents
   * [General](#general)
+  * [Repo structure](#repo-structure)
   * [Some details](#some-details)
   * [Training experiments](#training-experiments)
   * [Distributed training details](#distributed-training-details)
@@ -15,9 +16,9 @@ This repository contains an implementation of the original [Attention is All You
 
 Implementation wise this is essentially the same as the [gordicaleksa/pytorch-original-transformer](https://github.com/gordicaleksa/pytorch-original-transformer) but with a much simpler training pipeline. I also updated some of the parts of his code base to a newer PyTorch API, so it looks much simpler and works a lot faster.
 
-I have trained my model on Yandex RU-EN and Multi30K EN-DE datasets, but provide weights only for the former. On RU-EN translation I got about 23 BLEU, on EN-DE about 14 BLEU.
+I have trained my model on Yandex RU-EN and Multi30K EN-DE datasets, but provide weights only for the former. On RU-EN translation I got about 23 BLEU, on EN-DE about 21 BLEU.
 
-The repo contains a single GPU pipeline as well as distributed training pipeline. 
+The repo contains a single-GPU pipeline as well as distributed training pipeline. 
 
 ## Repo structure
 
@@ -34,8 +35,7 @@ Files:
 - `train_distributed.py` - distributed training pipeline.
 - `model_distributed.py` - a slight modification of the original model code to make it train on several GPUs.
 - `inference.ipynb` - an example of model inference.
-- `training.ipynb` - training code, but in a notebook.
-- `data.ipynb` - a mess. Decided to leave it out in case you are curious. There is a sentence length distribution plot at the end of the notebook.
+- `training.ipynb` - training code, but in a notebook. There is a ready to use pipeline for Multi30K dataset. You can simply run the notebook and observe magic.
 
 ## Some details
 
@@ -45,13 +45,13 @@ The Yandex dataset was filtered (the filtering code is available in the YandexDa
 
 During training I don't do any evaluation since it is very slow (I gave zero ducks to making it fast as I do not intend to get SOTA). I just train the model and see the final result.
 
-I also don't use learning rate schedule from the original paper since in my case this turned out to be suboptimal (the model was training extremely slow). So I just stick to fixed 1e-4 learning rate as it gave me the best results.
+I also don't use learning rate schedule from the original paper since in my case this turned out to be suboptimal (the model was training extremely slow). So I just stick to fixed 1e-4 learning rate as it gave me best results.
 
 ## Training experiments
 
 | Dataset | Batch size | Sequence length | GPU | Epochs | Time | BLEU |
 | - | - | - | - | - | - | - |
-| Multi30K EN-DE | 48 | 32 | RTX2060 | 20 | ~30 minutes | 14 |
+| Multi30K EN-DE | 48 | 32 | RTX2060 | 30 | ~60 minutes | 21 |
 | Yandex RU-EN | 256 | 64 | NVIDIA V100 | 20 | ~5 hours | 18 |
 | Yandex RU-EN filtered | 1024 | 64 | 4x NVIDIA V100 | 30 | ~9 hours | 23 |
 
@@ -59,7 +59,7 @@ As you can see, you can train the model on a middle sized GPU (RTX 2060) in a re
 
 ## Distributed training details
 
-I use dummy DataParallel from PyTorch and turns out that it sufficient for this case. Since the tensors are not large (simply contain token indices), there is not much of data transfer overhead and we get sweet over 90% GPU utilization. Though I had to make some tweeks to the model code because the output tensor wouldn't fit in GPUs' memory (which 30 GB btw!) as it had shape of [batch size, seq len, ~80000] which is stupidly large. I decided to make loss computation a part of the model so that each GPU processes its own part of data and spits out a loss scalar. That does not violate anything related to training dynamics, so don't you worry.
+I use dummy DataParallel from PyTorch and turns out that it sufficient for this case. Since the tensors are not large (simply contain token indices), there is not much of data transfer overhead and we get sweet over 90% GPU utilization. Though I had to make some tweeks to the model code because the output tensor wouldn't fit in GPUs' memory (which is 30 GB btw!) as it had shape of [batch size, seq len, ~80000] which is stupidly large. I decided to make loss computation a part of the model so that each GPU processes its own part of data and spits out a loss scalar. That does not violate anything related to training dynamics, so don't you worry.
 
 ## Trained model
 
@@ -109,6 +109,8 @@ Multi GPU. Do the following:
 - Parameters:
   - All of the parameters are the same as in the script above.
   - `--gpu_id` will stand for the 'main gpu' where all the weights are stored.
+
+In case you want simply clone and run stuff, go to `training.ipynb`, there is a ready to use pipeline for Multi30K dataset.
 
 
 ## Acknowledgements
