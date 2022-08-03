@@ -148,8 +148,8 @@ class Transformer(nn.Module):
         super().__init__()
         self.src_embedding = Embedding(src_vocab_size, dim)
         self.trg_embedding = Embedding(trg_vocab_size, dim)
-        self.src_pos_encoding = PositionalEncoding(seq_len, dropout_p=dropout_p)
-        self.trg_pos_encoding = PositionalEncoding(seq_len, dropout_p=dropout_p)
+        self.src_pos_encoding = PositionalEncoding(seq_len, dim=dim, dropout_p=dropout_p)
+        self.trg_pos_encoding = PositionalEncoding(seq_len, dim=dim, dropout_p=dropout_p)
         self.encoder = Encoder(dim, n_heads, pw_net_dim, n_en_blocks, dropout_p=dropout_p)
         self.decoder = Decoder(dim, n_heads, pw_net_dim, n_de_blocks, dropout_p=dropout_p)
 
